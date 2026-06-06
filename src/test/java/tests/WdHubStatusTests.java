@@ -71,7 +71,7 @@ public void unauthorizedShouldReturn401() {
                 .body(matchesJsonSchemaInClasspath("sсhemas/status_response_schema.json"));
     }
     @Test
-    @DisplayName("Проверка содержимого value: ключи, типы и значения")
+    @DisplayName("Проверка содержимого: value - ключи, типы и значения")
     public void valueContentTest() {
         given()
                 .log().all()
