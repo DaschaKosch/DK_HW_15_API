@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 
@@ -16,10 +17,11 @@ public class WdHubStatusTests extends TestBase{
                 .log().all()
                 .auth().basic("user1", "1234")
                 .when()
-                .get("/wd/hub/status")
+                .get("/status")
                 .then()
                 .log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .body("value.message", is("Selenoid 1.11.3 built at 2024-05-25_12:34:40PM"));
     }
 
     @Test
@@ -29,10 +31,12 @@ public class WdHubStatusTests extends TestBase{
                 .log().all()
                 .auth().basic("user3", "1234")
                 .when()
-                .get("/wd/hub/status")
+                .get("/status")
                 .then()
                 .log().all()
-                .statusCode(401);
+                .statusCode(401)
+                .body(containsString("Authorization Required"))
+                .header("WWW-Authenticate", containsString("Basic"));
     }
     @Test
     @DisplayName("Некорректный пароль: статус-код 401")
@@ -41,10 +45,12 @@ public class WdHubStatusTests extends TestBase{
                 .log().all()
                 .auth().basic("user1", "1233")
                 .when()
-                .get("/wd/hub/status")
+                .get("/status")
                 .then()
                 .log().all()
-                .statusCode(401);
+                .statusCode(401)
+                .body(containsString("Authorization Required"))
+                .header("WWW-Authenticate", containsString("Basic"));
     }
 
     @Test
@@ -53,10 +59,12 @@ public void unauthorizedShouldReturn401() {
     given()
             .log().all()
             .when()
-            .get("/wd/hub/status")
+            .get("/status")
             .then()
             .log().all()
-            .statusCode(401);
+            .statusCode(401)
+            .body(containsString("Authorization Required"))
+            .header("WWW-Authenticate", containsString("Basic"));
 }
     @Test
     @DisplayName("Ответ соответствует Json-схеме")
@@ -65,7 +73,7 @@ public void unauthorizedShouldReturn401() {
                 .log().all()
                 .auth().basic("user1", "1234")
                 .when()
-                .get("/wd/hub/status")
+                .get("/status")
                 .then()
                 .log().all()
                 .body(matchesJsonSchemaInClasspath("sсhemas/status_response_schema.json"));
@@ -77,7 +85,7 @@ public void unauthorizedShouldReturn401() {
                 .log().all()
                 .auth().basic("user1", "1234")
                 .when()
-                .get("/wd/hub/status")
+                .get("/status")
                 .then()
                 .log().all()
                 .statusCode(200)
